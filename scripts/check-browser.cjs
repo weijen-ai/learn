@@ -52,5 +52,5 @@ const base = process.argv[2] || 'http://127.0.0.1:8000/learn/'; const shots = pr
     await ev('document.querySelector("form.quiz").scrollIntoView({behavior:"instant"})'); await shot('desktop-quiz.png');
     assert.deepEqual(errors, [], 'no JavaScript exceptions'); assert.deepEqual(failedLoads, [], 'no failed resource loads');
     console.log('PASS: 3 pages at 1440px and 390px; stylesheet, skip link, focusability, KaTeX, flashcard deck, quiz feedback/score/reset; no JS errors or failed loads.');
-  } finally { ws?.close(); chrome.kill('SIGTERM'); fs.rmSync(profile, { recursive: true, force: true }); }
+  } finally { ws?.close(); chrome.kill('SIGTERM'); await new Promise(r => chrome.once('exit', r)); fs.rmSync(profile, { recursive: true, force: true }); }
 })().catch(e => { console.error('FAIL:', e.message); process.exitCode = 1; });

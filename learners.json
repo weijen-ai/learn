@@ -1,0 +1,29 @@
+{
+  "learners": [
+    {
+      "slug": "weijen",
+      "display_name": "Wei Jen",
+      "tagline": "Study guides built from Wei Jen's own reading, organised by subject and course.",
+      "external": [
+        {
+          "topic": "Mathematics",
+          "course": "Mathematics for Machine Learning",
+          "unit": "Chapter 2",
+          "title": "Mathematics for Machine Learning",
+          "description": "Chapter 2 · Linear Algebra. Eleven lessons with interactive diagrams and a practice guide.",
+          "url": "https://weijen.github.io/mml/chapter-2/",
+          "date": "2026-09-06"
+        },
+        {
+          "topic": "English grammar",
+          "course": "English Grammar in Use",
+          "unit": "Unit 26",
+          "title": "Can, could & (be) able to",
+          "description": "Unit 26. Meaning, common mistakes, and practice, explained in Traditional Chinese.",
+          "url": "https://weijen.github.io/Learning-with-ai/weijen/english-grammar/can-could-able-to/unit-26/",
+          "date": "2026-09-06"
+        }
+      ]
+    }
+  ]
+}

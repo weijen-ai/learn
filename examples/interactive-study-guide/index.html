@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Demo study guide showing the Learning with AI pattern: objectives, progressive explanation, formulas, flashcards, and a quiz with immediate feedback.">
+<title>Example study guide · Percent change</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%2323786b%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-family=%27Georgia,serif%27 font-size=%2719%27 text-anchor=%27middle%27 fill=%27%23fffef9%27%3EL%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/site.css">
+<link rel="stylesheet" href="../../assets/vendor/katex/katex.min.css">
+<script src="../../assets/vendor/katex/katex.min.js" defer></script>
+<script src="../../assets/vendor/katex/contrib/auto-render.min.js" defer></script>
+<script src="../../assets/js/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../../">Learning <span>with</span> AI</a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../../">Learners</a>
+      <a href="./" aria-current="page">Example guide</a>
+      <a href="https://github.com/weijen-ai/learn">Source on GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="../../">Learning with AI</a></li>
+      <li>Examples</li>
+      <li aria-current="page">Interactive study guide</li>
+    </ol>
+  </nav>
+
+  <section aria-labelledby="title">
+    <p class="eyebrow"><span class="badge coral">Demo content</span> Example unit</p>
+    <h1 id="title">Percent change</h1>
+    <p class="lede">This page is a template. Its content is deliberately simple and original so the interactive pattern is easy to see: objectives, an explanation that builds up in steps, a formula, flashcards, and a short quiz.</p>
+  </section>
+
+  <section class="objectives" aria-labelledby="objectives">
+    <h2 id="objectives">Learning objectives</h2>
+    <p>After this unit you should be able to:</p>
+    <ul>
+      <li>explain what a percent change measures and why the <em>old</em> value is the reference;</li>
+      <li>compute a percent change from two numbers, including a decrease;</li>
+      <li>recognise the common mistake of dividing by the new value.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="explain">
+    <h2 id="explain">Explanation, step by step</h2>
+    <p>Open each step in order. Each one adds a little to the last.</p>
+
+    <details class="step" open>
+      <summary>Step 1 · What question does a percent change answer?</summary>
+      <div class="body">
+        <p>A price goes from 40 to 50. Saying “it went up by 10” is true, but 10 means something different for a 40-dollar item than for a 4,000-dollar item. A percent change compares the difference <strong>to where you started</strong>.</p>
+        <p>So the question is: <em>the change is what fraction of the old value?</em></p>
+      </div>
+    </details>
+
+    <details class="step">
+      <summary>Step 2 · The formula</summary>
+      <div class="body">
+        <p>Write the old value as $\text{old}$ and the new value as $\text{new}$. Then</p>
+        <div class="math-block">$$\text{percent change} = \frac{\text{new} - \text{old}}{\text{old}} \times 100\%$$</div>
+        <p>The numerator is the change. The denominator is the reference: always the old value.</p>
+      </div>
+    </details>
+
+    <details class="step">
+      <summary>Step 3 · A worked example (and a decrease)</summary>
+      <div class="body">
+        <p>From 40 to 50: $\frac{50 - 40}{40} \times 100\% = \frac{10}{40} \times 100\% = 25\%$.</p>
+        <p>From 50 back to 40: $\frac{40 - 50}{50} \times 100\% = -20\%$. The same 10 is now a smaller share, because the reference is 50, and the sign tells you it is a decrease.</p>
+        <p><strong>Check yourself:</strong> going up 25% and then down 20% returns you to the start. Percent changes do not simply cancel.</p>
+      </div>
+    </details>
+  </section>
+
+  <section aria-labelledby="flashcards">
+    <h2 id="flashcards">Flashcards</h2>
+    <p>Read the prompt, answer in your head, then reveal. With JavaScript on, the cards are shown one at a time.</p>
+    <div class="flashcard-deck">
+      <article class="flashcard">
+        <p class="prompt">Which value goes in the denominator of a percent change?</p>
+        <details><summary>Show answer</summary><div class="answer">The <strong>old</strong> value. The change is measured relative to where you started.</div></details>
+      </article>
+      <article class="flashcard">
+        <p class="prompt">A quantity goes from 80 to 100. What is the percent change?</p>
+        <details><summary>Show answer</summary><div class="answer">$\frac{100-80}{80}\times100\% = 25\%$.</div></details>
+      </article>
+      <article class="flashcard">
+        <p class="prompt">What does a negative percent change mean?</p>
+        <details><summary>Show answer</summary><div class="answer">A decrease: the new value is smaller than the old one.</div></details>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="quiz">
+    <h2 id="quiz">Quick quiz</h2>
+    <p>Pick an answer to get immediate feedback.</p>
+    <form class="quiz" novalidate>
+      <fieldset class="quiz-item" data-answer="b" data-explain="The change is 15 and the reference is the old value 60, so 15 ÷ 60 = 25%.">
+        <legend>1. A price rises from 60 to 75. What is the percent change?</legend>
+        <label><input type="radio" name="q1" value="a"> 20%</label>
+        <label><input type="radio" name="q1" value="b"> 25%</label>
+        <label><input type="radio" name="q1" value="c"> 15%</label>
+      </fieldset>
+      <fieldset class="quiz-item" data-answer="c" data-explain="From 200 to 150 the change is −50, and −50 ÷ 200 = −25%.">
+        <legend>2. A value falls from 200 to 150. What is the percent change?</legend>
+        <label><input type="radio" name="q2" value="a"> −33%</label>
+        <label><input type="radio" name="q2" value="b"> −50%</label>
+        <label><input type="radio" name="q2" value="c"> −25%</label>
+      </fieldset>
+      <fieldset class="quiz-item" data-answer="a" data-explain="Dividing by the new value gives 10 ÷ 50 = 20%, which is the common mistake; the correct reference is the old value.">
+        <legend>3. Someone computes the change from 40 to 50 as 20%. What went wrong?</legend>
+        <label><input type="radio" name="q3" value="a"> They divided by the new value instead of the old value</label>
+        <label><input type="radio" name="q3" value="b"> They forgot to multiply by 100</label>
+        <label><input type="radio" name="q3" value="c"> Nothing, 20% is correct</label>
+      </fieldset>
+      <p class="quiz-score" role="status" aria-live="polite"></p>
+      <div class="quiz-actions">
+        <button type="submit" class="button">Check answers</button>
+        <button type="reset" class="button secondary">Reset</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="provenance" aria-labelledby="source">
+    <h2 id="source">Source and provenance</h2>
+    <p><strong>Source:</strong> <em>[placeholder]</em> — a real guide names the book, chapter, and page range it is based on, or the learner's own notes, and states which parts are added explanation.</p>
+    <p><strong>This demo:</strong> original content written for this template. It is not based on any textbook.</p>
+    <p><strong>Copyright:</strong> © 2026 Learning with AI contributors. Explanations and exercises on this page are original and may be reused with attribution. Guides that cite a source do not reproduce its text or images.</p>
+  </section>
+
+  <p><a class="button secondary" href="../../">← Back to the library</a></p>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Learning with AI · Example guide. Formulas are rendered by <a href="https://katex.org/">KaTeX</a>, bundled with the site (MIT licence).</p>
+  </div>
+</footer>
+</body>
+</html>

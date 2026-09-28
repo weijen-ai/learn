@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="學會 Bayesian Optimization（貝葉斯最佳化）的核心循環：用機率模型估計未知目標，再用 acquisition function 挑選下一個最值得試的點。適合目標評估昂貴、沒有梯度、實驗次數有限的問題，例如機器學習超參數調整。">
+<meta name="learn-publish-id" content="bde81b3953ba4b4e8149e7c4c9628341">
+<meta name="generator" content="hermes-azure learn_publisher">
+<title>貝葉斯最佳化：用少量昂貴實驗找好答案 · Wei Jen · Learning with AI</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%2323786b%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-family=%27Georgia,serif%27 font-size=%2719%27 text-anchor=%27middle%27 fill=%27%23fffef9%27%3EL%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../../../assets/css/site.css">
+<link rel="stylesheet" href="../../../../assets/vendor/katex/katex.min.css">
+<script src="../../../../assets/vendor/katex/katex.min.js" defer></script>
+<script src="../../../../assets/vendor/katex/contrib/auto-render.min.js" defer></script>
+<script src="../../../../assets/js/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../../../../">Learning <span>with</span> AI</a>
+    <nav class="site-nav" aria-label="Site"><a href="../../../../">Learners</a><a href="../../../../examples/interactive-study-guide/">Example guide</a><a href="https://github.com/weijen-ai/learn">Source on GitHub</a></nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="../../../../">All learners</a></li>
+      <li><a href="../../../../weijen/">Wei Jen</a></li>
+      <li>機器學習與最佳化</li>
+      <li>Bayesian Optimization 入門</li>
+      <li aria-current="page">Bayesian Optimization Intro</li>
+    </ol>
+  </nav>
+
+  <section aria-labelledby="title">
+    <p class="eyebrow">機器學習與最佳化 · Bayesian Optimization 入門</p>
+    <h1 id="title">貝葉斯最佳化：用少量昂貴實驗找好答案</h1>
+    <p class="lede">學會 Bayesian Optimization（貝葉斯最佳化）的核心循環：用機率模型估計未知目標，再用 acquisition function 挑選下一個最值得試的點。適合目標評估昂貴、沒有梯度、實驗次數有限的問題，例如機器學習超參數調整。</p>
+    <p class="breadcrumb"><span class="badge">2026-09-28</span> AI-assisted study guide, grounded in: Peter I. Frazier, A Tutorial on Bayesian Optimization (2018); Snoek, Larochelle &amp; Adams, Practical Bayesian Optimization of Machine Learning Algorithms (2012); BoTorch official tutorials · <a href="https://arxiv.org/abs/1807.02811" rel="noopener">link</a></p>
+  </section>
+
+  <section class="objectives" aria-labelledby="objectives">
+    <h2 id="objectives">Learning objectives</h2>
+    <ul><li>說明貝葉斯最佳化適合解決哪一類問題。</li><li>區分 surrogate model 與 acquisition function 的工作。</li><li>描述 Gaussian Process 如何提供預測平均值與不確定性。</li><li>用探索與利用的角度解釋 Expected Improvement。</li><li>列出使用貝葉斯最佳化時的重要限制與檢查事項。</li></ul>
+  </section>
+
+  <section aria-labelledby="explain">
+    <h2 id="explain">Explanation, step by step</h2>
+<details class="step" open>
+<summary>1. 先想像一個昂貴的黑盒問題</summary>
+<div class="body">
+<p>你想調整模型的學習率，目標是讓驗證準確率越高越好。但每試一組參數都要訓練模型半小時，而且你看不到準確率對學習率的梯度。這就是昂貴、黑盒、通常也沒有梯度的最佳化問題。\n\n記號上，把可選設定寫成 x，把真實評分寫成 f(x)。我們想找讓 f(x) 最大（或最小）的 x，但每次查詢 f(x) 都很貴。貝葉斯最佳化（Bayesian Optimization, BO）不會盲目掃完整張網格；它會根據已做過的實驗，逐步挑選下一次最有價值的實驗。</p>
+</div>
+</details>
+<details class="step">
+<summary>2. BO 的兩個核心：代理模型與選點規則</summary>
+<div class="body">
+<p>BO 通常由兩個零件搭配：\n- 代理模型（surrogate model）：近似昂貴的 f(x)，並估計自己有多不確定。Gaussian Process（高斯過程，GP）是常見選擇。對每個候選 x，GP 通常提供預測平均值 μ(x) 和預測標準差 σ(x)。\n- Acquisition function（採集函數／選點效用）：把「目前預測看起來多好」和「還有多少不確定」合成一個分數，用來挑下一個實驗點。\n\n直覺比喻：代理模型像一張帶有可信度標記的地圖；採集函數像探勘策略，決定要去已知富礦附近挖，還是去資訊不足的區域探查。GP 很常見，但不是所有 BO 方法都必須使用 GP。</p>
+</div>
+</details>
+<details class="step">
+<summary>3. 探索與利用：為什麼不只挑目前預測最高的點？</summary>
+<div class="body">
+<p>利用（exploitation）是去試模型認為表現很好的地方；探索（exploration）是去試目前不確定、可能藏著更好結果的地方。只利用容易困在已知的局部好區域；只探索則可能浪費實驗。BO 透過採集函數在兩者間取捨。\n\n常見的 Expected Improvement（EI，預期改善）估計候選點超越目前最佳值的期望幅度。對最大化問題，若 GP 後驗近似為常態分布，可寫成：\n$$z=\\frac{\\mu(x)-f^<em>-\\xi}{\\sigma(x)},\\qquad EI(x)=(\\mu(x)-f^</em>-\\xi)\\Phi(z)+\\sigma(x)\\phi(z).$$\n其中 f* 是目前最佳觀測值，ξ 是鼓勵探索的門檻，Φ 和 φ 分別是標準常態分布的累積分布函數與機率密度函數。公式的兩部分可粗略理解為：平均預測有沒有機會超越目前最佳，以及不確定性帶來的上行可能。實務上還有 UCB、Probability of Improvement 等選點規則；不同問題可選不同方法。</p>
+</div>
+</details>
+<details class="step">
+<summary>4. 一輪 BO 怎麼跑？</summary>
+<div class="body">
+<p>典型流程如下：\n1. 定義可調參數、上下界、目標指標與每次評估的成本。\n2. 先做幾個初始實驗，讓模型有基本資料；可用隨機或空間均勻的設計。\n3. 用所有資料更新代理模型，得到每個候選點的預測與不確定性。\n4. 最大化採集函數，選出下一個要測的 x。\n5. 真的執行昂貴實驗，取得 y=f(x)，再把資料加回去。\n6. 重複直到預算用完、表現足夠好，或近期改善很小。\n\n核心是每次實驗後都更新模型；BO 不是先一次排好所有試驗，而是序列式地根據新結果調整下一步。</p>
+</div>
+</details>
+<details class="step">
+<summary>5. 小例子：替模型找學習率</summary>
+<div class="body">
+<p>假設 x 是學習率的 log 尺度，f(x) 是模型驗證準確率。你先測了幾個分散的設定，發現某一帶效果不錯；但離已測點較遠的另一帶仍很不確定。\n\n只看 μ(x)，代理模型可能會挑「目前預測最高」的位置；EI 則也會考量 σ(x)，所以可能選擇一個預測不錯、又有機會帶來新資訊的位置。新訓練完成後，將真實準確率回填，GP 更新，下一輪選點也會改變。這是示意情境，不是特定模型實驗的真實數據。</p>
+</div>
+</details>
+<details class="step">
+<summary>6. 什麼時候適合？常見陷阱</summary>
+<div class="body">
+<p>通常值得考慮 BO 的情況：每次評估很花時間或金錢、只能做有限次試驗、不容易取得梯度，而搜尋空間不是極高維。Frazier 的教學將標準 BO 特別定位在昂貴、連續、相對低維的黑盒函數；維度、離散變數、噪音或限制條件增加時，可能需要不同代理模型或專門的 BO 變體。\n\n使用前先確認：\n- 目標指標是否定義清楚，且每次比較方式一致？\n- 評估有噪音嗎？若有，不能把一次偶然高分當成確定最佳值；應用適合 noisy observations 的方法。\n- 參數尺度與上下界合理嗎？GP 對尺度、核函數和平滑度假設可能敏感。\n- 是否能平行跑實驗？標準序列式 BO 不會自動等於批次 BO。\n- 如果評估很便宜，隨機搜尋或其他簡單方法可能更划算。\n\nBO 是節省昂貴評估次數的策略，不保證每次都找到全域最佳解。</p>
+</div>
+</details>
+<details class="step">
+<summary>7. 一句話記住</summary>
+<div class="body">
+<p>貝葉斯最佳化的節奏是：「先用已知實驗建立一張帶不確定性的地圖，再選最值得試的下一點；取得結果後更新地圖，繼續迭代。」代理模型回答『我目前相信什麼、還不確定什麼？』；採集函數回答『下一次最值得在哪裡花成本？』</p>
+</div>
+</details>
+  </section>
+
+<section aria-labelledby="vocab">
+<h2 id="vocab">Vocabulary</h2>
+<div class="table-wrap"><table><thead><tr><th scope="col">Term</th><th scope="col">Meaning</th></tr></thead><tbody><tr><th scope="row">黑盒目標函數（black-box objective）</th><td>可以輸入設定並取得評分，但不知道內部公式或無法有效使用梯度的函數。</td></tr><tr><th scope="row">代理模型（surrogate model）</th><td>用較便宜的模型近似昂貴目標，並在 BO 中提供預測與不確定性。</td></tr><tr><th scope="row">Gaussian Process（GP，高斯過程）</th><td>一種機率模型，可為未知函數在候選位置提供預測分布；常用於 BO，但不是唯一選擇。</td></tr><tr><th scope="row">Acquisition function（採集函數）</th><td>根據代理模型的預測與不確定性，評估下一個實驗點值得不值得測。</td></tr><tr><th scope="row">Expected Improvement（EI，預期改善）</th><td>估計一次新評估相對目前最佳觀測值可能帶來的預期提升。</td></tr><tr><th scope="row">探索／利用（exploration/exploitation）</th><td>探索重視未知區域的資訊；利用重視目前預測表現好的區域。</td></tr></tbody></table></div>
+</section>
+<section aria-labelledby="flashcards">
+<h2 id="flashcards">Flashcards</h2>
+<p>Answer in your head, then reveal.</p>
+<div class="flashcard-deck">
+<article class="flashcard">
+<p class="prompt">貝葉斯最佳化最適合哪類工作？</p>
+<details><summary>Show answer</summary><div class="answer"><p>每次評估昂貴、可用評估次數有限、目標像黑盒且沒有可用梯度的最佳化問題。</p></div></details>
+</article>
+<article class="flashcard">
+<p class="prompt">代理模型在 BO 中做什麼？</p>
+<details><summary>Show answer</summary><div class="answer"><p>根據過去實驗近似目標函數，並估計候選點的預測值與不確定性。</p></div></details>
+</article>
+<article class="flashcard">
+<p class="prompt">Acquisition function 在 BO 中做什麼？</p>
+<details><summary>Show answer</summary><div class="answer"><p>把目前預測表現與不確定性轉成選點效用，決定下一個要評估的位置。</p></div></details>
+</article>
+<article class="flashcard">
+<p class="prompt">GP 的 μ(x) 和 σ(x) 各代表什麼？</p>
+<details><summary>Show answer</summary><div class="answer"><p>μ(x) 是預測平均值；σ(x) 表示預測的不確定程度。</p></div></details>
+</article>
+<article class="flashcard">
+<p class="prompt">Exploration 與 exploitation 的差別？</p>
+<details><summary>Show answer</summary><div class="answer"><p>Exploration 去不確定區域收集資訊；exploitation 去目前看起來表現好的區域。</p></div></details>
+</article>
+<article class="flashcard">
+<p class="prompt">EI 主要考量什麼？</p>
+<details><summary>Show answer</summary><div class="answer"><p>新點超越目前最佳觀測值的預期改善幅度；它兼顧預測好壞與不確定性。</p></div></details>
+</article>
+</div>
+</section>
+<section aria-labelledby="quiz">
+<h2 id="quiz">Quick quiz</h2>
+<p>Pick an answer to get immediate feedback.</p>
+<form class="quiz" novalidate>
+<fieldset class="quiz-item" data-answer="b" data-explain="BO 的主要價值在於用較少次昂貴、黑盒、無梯度的評估來尋找好設定。">
+<legend>1. 哪一種情況最能體現 BO 的優勢？</legend>
+<label><input type="radio" name="q1" value="a"> 每次函數評估只需微秒，而且有精確梯度</label>
+<label><input type="radio" name="q1" value="b"> 每次實驗要數小時，無法取得梯度，而且只能試有限組設定</label>
+<label><input type="radio" name="q1" value="c"> 輸入和輸出都已知解析公式，且能直接求全域極值</label>
+<label><input type="radio" name="q1" value="d"> 只想把既有資料依字母排序</label>
+</fieldset>
+<fieldset class="quiz-item" data-answer="b" data-explain="σ(x) 越大代表模型對該候選點越不確定；這會影響探索型採集函數的分數。">
+<legend>2. 在 GP 代理模型中，σ(x) 通常表示什麼？</legend>
+<label><input type="radio" name="q2" value="a"> 目前最佳觀測值</label>
+<label><input type="radio" name="q2" value="b"> 候選點的預測不確定性</label>
+<label><input type="radio" name="q2" value="c"> 已完成的實驗次數</label>
+<label><input type="radio" name="q2" value="d"> 目標函數的梯度</label>
+</fieldset>
+<fieldset class="quiz-item" data-answer="a" data-explain="有不確定性的區域可能藏著更好結果；探索價值可能值得支付一次評估成本。">
+<legend>3. 採集函數為什麼可能選擇目前預測平均值不是最高的點？</legend>
+<label><input type="radio" name="q3" value="a"> 它可能看重該點的高不確定性與探索價值</label>
+<label><input type="radio" name="q3" value="b"> 它一定忽略所有已觀測資料</label>
+<label><input type="radio" name="q3" value="c"> 它只會隨機選點</label>
+<label><input type="radio" name="q3" value="d"> 它直接知道未知真實函數的答案</label>
+</fieldset>
+<fieldset class="quiz-item" data-answer="b" data-explain="BO 會反覆把真實評估結果加入資料，再更新模型與下一步選點。">
+<legend>4. 下列哪句最正確地描述 BO 的迭代？</legend>
+<label><input type="radio" name="q4" value="a"> 先建好固定的全部試驗清單，之後不再更新</label>
+<label><input type="radio" name="q4" value="b"> 建立代理模型、用採集函數選點、真實評估，再更新模型</label>
+<label><input type="radio" name="q4" value="c"> 只訓練 GP，不需要執行真實目標函數</label>
+<label><input type="radio" name="q4" value="d"> 每一輪都選模型最不確定的點，永遠不利用已知好區域</label>
+</fieldset>
+<p class="quiz-score" role="status" aria-live="polite"></p>
+<div class="quiz-actions"><button type="submit" class="button">Check answers</button><button type="reset" class="button secondary">Reset</button></div>
+</form>
+</section>
+  <section class="provenance" aria-labelledby="source">
+    <h2 id="source">Source and provenance</h2>
+    <p><strong>Source:</strong> Peter I. Frazier, A Tutorial on Bayesian Optimization (2018); Snoek, Larochelle &amp; Adams, Practical Bayesian Optimization of Machine Learning Algorithms (2012); BoTorch official tutorials · <a href="https://arxiv.org/abs/1807.02811" rel="noopener">link</a></p>
+    <p>核心流程、Gaussian Process 代理模型、acquisition functions 與 Expected Improvement 依據 Frazier 的教學及 Snoek 等人的機器學習應用論文整理；實務工具定位參考 BoTorch 官方教學。中文直覺解說、學習率示意案例、flashcards 與測驗為原創教學補充；示意例子不代表實驗數據。參考連結：https://arxiv.org/abs/1206.2944；https://botorch.org/docs/tutorials</p>
+    <p><strong>Copyright:</strong> © 2026 Wei Jen. Explanations, examples and exercises are original, AI-assisted study notes grounded in the source named above; the source itself is not reproduced and remains the property of its authors.</p>
+  </section>
+
+  <p><a class="button secondary" href="../../../../weijen/">← Back to Wei Jen's space</a></p>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Learning with AI · Wei Jen's space. Guides are AI-assisted and source-grounded.</p>
+    <p>Formulas are rendered by KaTeX, bundled with the site (MIT licence).</p>
+  </div>
+</footer>
+</body>
+</html>

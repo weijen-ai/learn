@@ -1,0 +1,22 @@
+{
+  "title": "貝葉斯最佳化：用少量昂貴實驗找好答案",
+  "topic_slug": "machine-learning",
+  "topic_title": "機器學習與最佳化",
+  "course_slug": "bayesian-optimization-foundations",
+  "course_title": "Bayesian Optimization 入門",
+  "unit_slug": "bayesian-optimization-intro",
+  "unit_title": "Bayesian Optimization Intro",
+  "language": "zh-Hant",
+  "summary": "學會 Bayesian Optimization（貝葉斯最佳化）的核心循環：用機率模型估計未知目標，再用 acquisition function 挑選下一個最值得試的點。適合目標評估昂貴、沒有梯度、實驗次數有限的問題，例如機器學習超參數調整。",
+  "published_at": "2026-09-28",
+  "first_published_at": "2026-09-28",
+  "features": [
+    "objectives",
+    "explanation",
+    "vocabulary",
+    "flashcards",
+    "quiz"
+  ],
+  "publish_id": "bde81b3953ba4b4e8149e7c4c9628341",
+  "source_label": "Peter I. Frazier, A Tutorial on Bayesian Optimization (2018); Snoek, Larochelle & Adams, Practical Bayesian Optimization of Machine Learning Algorithms (2012); BoTorch official tutorials"
+}

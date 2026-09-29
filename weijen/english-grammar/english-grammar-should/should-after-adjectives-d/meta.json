@@ -1,13 +1,13 @@
 {
-  "title": "Should after adjectives：形容詞後的反應用法",
+  "title": "Should 的 D、E、F：形容詞反應與條件句",
   "topic_slug": "english-grammar",
   "topic_title": "英文文法",
   "course_slug": "english-grammar-should",
   "course_title": "English Grammar：Should 的常見用法",
   "unit_slug": "should-after-adjectives-d",
-  "unit_title": "Section D：形容詞後的 should",
+  "unit_title": "Sections D–F：Should 的三種用法",
   "language": "zh-Hant",
-  "summary": "學習形容詞後 that 子句中的 should：它可表達說話者覺得某事奇怪、有趣、自然或意外，不是義務或建議。本教材聚焦課本 Section D，附 20 個原創例句與練習。",
+  "summary": "延續 Section D 的形容詞反應用法，加入 E 的 if + should 條件句，以及 F 的 should 倒裝條件句。共保留 D 的 20 個例句，另加 E、F 各 5 句，並比較三種 should 的意思與句型。",
   "published_at": "2026-09-29",
   "first_published_at": "2026-09-29",
   "features": [
@@ -16,6 +16,6 @@
     "flashcards",
     "quiz"
   ],
-  "publish_id": "8ebfcf8d817347189938f8530fdd385f",
-  "source_label": "使用者提供的英文文法課本照片，Section D；Cambridge English Grammar Today: Should"
+  "publish_id": "6739aeb5162148afab4f817cba6183f3",
+  "source_label": "使用者提供的英文文法課本照片，Sections D–F；Cambridge English Grammar Today: Should"
 }
